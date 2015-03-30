@@ -1,0 +1,613 @@
+#%RAML 0.8
+title: Dropbox Core API
+version: 1.0
+baseUri: https://api.dropbox.com/1
+securedBy: [oauth_2_0]
+securitySchemes:
+- oauth_2_0:
+    description: |
+            Dropbox supports OAuth 2.0 for authenticating all API requests.
+    type: OAuth 2.0
+    describedBy:
+      headers:
+        Authorization:
+          description: |
+            Used to send a valid OAuth 2 access token. Do not use
+            with the "access_token" query string parameter.
+          type: string
+      queryParameters:
+        access_token:
+          description: |
+            Used to send a valid OAuth 2 access token. Do not use together with
+            the "Authorization" header
+          type: string
+      responses:
+        401:
+          description: |
+            Bad or expired token. This can happen if the user or Dropbox
+            revoked or expired an access token. To fix, you should re-
+            authenticate the user.
+        403:
+          description: |
+            Bad OAuth request (wrong consumer key, bad nonce, expired
+            imestamp...). Unfortunately, re-authenticating the user won't help here.
+    settings:
+      authorizationUri: https://www.dropbox.com/1/oauth2/authorize 
+      accessTokenUri: https://www.dropbox.com/developers/core/docs#oa2-token
+      authorizationGrants: [ authorization_code ]
+schemas:
+ - newFolder: |
+    {
+      "type": "object",
+      "$schema": "http://json-schema.org/draft-03/schema",
+      "id": "http://jsonschema.net",
+      "required": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "parent": {
+          "required": true,
+          "id": {
+            "type": "integer",
+            "required": true
+          }
+        }
+      }
+    }
+/oauth2:
+  /authorize:
+    get:
+      description: <<This starts the OAuth 2.0 authorization flow. This isn't an API call—it's the web page that lets the user sign in to Dropbox and authorize your app. After the user decides whether or not to authorize your app, they will be redirected to the URI specified by redirect_uri.>>
+      queryParameters:
+        response_type:
+          description: The grant type requested, either token or code.
+          required: true
+          type: string
+        client_id:
+          description: The app's key, found in the App Console.
+          required: true
+          type: string
+        redirect_uri:
+          description:  Where to redirect the user after authorization has completed. This must be the exact URI registered in the App Console; even 'localhost' must be listed if it is used for testing. A redirect URI is required for a token flow, but optional for code. If the redirect URI is omitted, the code will be presented directly to the user and they will be invited to enter the information in your app.
+          required: false
+          type: string
+        state:
+          description: Up to 500 bytes of arbitrary data that will be passed back to your redirect URI. This parameter should be used to protect against cross-site request forgery (CSRF). See Sections 4.4.1.8 and 4.4.2.5 of the OAuth 2.0 threat model spec.
+          required: false
+          type: string
+        force_reapprove:
+          description: Whether or not to force the user to approve the app again if they've already done so. If false (default), a user who has already approved the application may be automatically redirected to the URI specified by redirect_uri. If true, the user will not be automatically redirected and will have to approve the app again.
+          required: false
+          type: string
+        disable_signup:
+          description: When true (default is false) users will not be able to sign up for a Dropbox account via the authorization page. Instead, the authorization page will show a link to the Dropbox iOS app in the App Store. This is only intended for use when necessary for compliance with App Store policies.
+          required: false
+          type: string
+      responses:
+        302:
+  /token:
+    post:
+      description: <<This endpoint only applies to apps using the authorization code flow. An app calls this endpoint to acquire a bearer token once the user has authorized the app.
+       Calls to /oauth2/token need to be authenticated using the apps's key and secret. These can either be passed as POST parameters (see parameters below) or via HTTP basic authentication. If basic authentication is used, the app key should be provided as the username, and the app secret should be provided as the password.>>
+      queryParameters:
+        code:
+          description: The code acquired by directing users to /oauth2/authorize?response_type=code.
+          required: true
+          type: string
+        grant_type:
+          description:  The grant type, which must be authorization_code
+          required: true
+          type: string
+        client_id:
+          description: If credentials are passed in POST parameters, this parameter should be present and should be the app's key (found in the App Console).
+          required: false
+          type: string
+        client_secret:
+          description:  If credentials are passed in POST parameters, this parameter should be present and should be the app's secret.
+          required: false
+          type: string
+        redirect_uri:
+          description:  Only used to validate that it matches the original /oauth2/authorize, not used to redirect again.
+          required: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345"}
+  
+/account/info:
+  get:
+    description: <<Retrieves information about the user's account.>>
+    queryParameters:
+      locale:
+        required: false
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "uid": 12345678,
+                "display_name": "John User",
+                "name_details": {
+                    "familiar_name": "John",
+                    "given_name": "John",
+                    "surname": "User"
+                },
+                "referral_link": "https://www.dropbox.com/referrals/r1a2n3d4m5s6t7",
+                "country": "US",
+                "locale": "en",
+                "is_paired": false,
+                "team": {
+                    "name": "Acme Inc.",
+                    "team_id": "dbtid:1234abcd"
+                },
+                "quota_info": {
+                    "shared": 253738410565,
+                    "quota": 107374182400000,
+                    "normal": 680031877871
+                }
+              }
+/metadata/auto/{path}:
+  get:
+    description: <<Retrieves file and folder metadata.>>
+    queryParameters:
+      file_limit:
+        required: false
+        type: string
+      hash:
+        required: false
+        type: string
+      list:
+        required: false
+        type: string
+      include_deleted:
+        required: false
+        type: boolean
+      rev:
+        required: false
+        type: string
+      locale:
+        required: false
+        type: string
+      include_media_info:
+        required: false
+        type: boolean
+      include_membership:
+        required: false
+        type: boolean
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "size": "225.4KB",
+                "rev": "35e97029684fe",
+                "thumb_exists": false,
+                "bytes": 230783,
+                "modified": "Tue, 19 Jul 2011 21:55:38 +0000",
+                "client_mtime": "Mon, 18 Jul 2011 18:04:35 +0000",
+                "path": "/Getting_Started.pdf",
+                "is_dir": false,
+                "icon": "page_white_acrobat",
+                "root": "dropbox",
+                "mime_type": "application/pdf",
+                "revision": 220823
+              }
+/delta/auto/{path}:
+  post:
+    description: <<A way of letting you keep up with changes to files and folders in a user's Dropbox. You can periodically call /delta to get a list of "delta entries", which are instructions on how to update your local state to match the server's state.>>
+    queryParameters:
+      cursor:
+        required: false
+        type: string
+      locale:
+        required: false
+        type: string
+      path_prefix:
+        required: false
+        type: string
+      include_media_info:
+        required: false
+        type: boolean
+    responses:
+      200:
+        body:
+          application/json:
+  /latest_cursor/auto/{path}:
+    post:
+      description: <<A way to quickly get a cursor for the server's state, for use with /delta. Unlike /delta, /delta/latest_cursor does not return any entries, so your app will not know about any existing files or folders in the Dropbox account. For example, if your app processes future delta entries and sees that a folder was deleted, your app won't know what files were in that folder. Use this endpoint if your app only needs to know about new files and modifications and doesn't need to know about files that already exist in Dropbox. If you need to build local state to match the server state in Dropbox, you should instead use /delta.>>
+      queryParameters:
+        cursor:
+          required: false
+          type: string
+        include_media_info:
+          required: false
+          type: boolean
+      responses:
+        200:
+          body:
+            application/json:
+/revisions/auto/{path}:
+  get:
+    description: <<Obtains metadata for the previous revisions of a file.
+      Only revisions up to thirty days old are available (or more if the Dropbox user has Packrat). You can use the revision number in conjunction with the /restore call to revert the file to its previous state.>>
+    queryParameters:
+      rev_limit:
+        required: false
+        type: string
+      locale:
+        required: false
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                [
+                  {
+                    "is_deleted": true,
+                    "revision": 4,
+                    "rev": "40000000d",
+                    "thumb_exists": false,
+                    "bytes": 0,
+                    "modified": "Wed, 20 Jul 2011 22:41:09 +0000",
+                    "path": "/hi2",
+                    "is_dir": false,
+                    "icon": "page_white",
+                    "root": "app_folder",
+                    "mime_type": "application/octet-stream",
+                    "size": "0 bytes"
+                  },
+                  {
+                    "revision": 1,
+                    "rev": "10000000d",
+                    "thumb_exists": false,
+                    "bytes": 3,
+                    "modified": "Wed, 20 Jul 2011 22:40:43 +0000",
+                    "path": "/hi2",
+                    "is_dir": false,
+                    "icon": "page_white",
+                    "root": "app_folder",
+                    "mime_type": "application/octet-stream",
+                    "size": "3 bytes"
+                  }
+                ]
+              }
+/restore/auto/{path}:
+  post:
+    description: <<Restores a file path to a previous revision.
+
+      Unlike downloading a file at a given revision and then re-uploading it, this call is atomic. It also saves a bunch of bandwidth.>>
+    queryParameters:
+      rev:
+        required: true
+        type: string
+      locale:
+        required: false
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "is_deleted": true,
+                "revision": 4,
+                "rev": "40000000d",
+                "thumb_exists": false,
+                "bytes": 0,
+                "modified": "Wed, 20 Jul 2011 22:41:09 +0000",
+                "path": "/hi2",
+                "is_dir": false,
+                "icon": "page_white",
+                "root": "sandbox",
+                "mime_type": "application/octet-stream",
+                "size": "0 bytes"
+               }
+/search/auto/{path}:
+  get:
+    description: <<Returns metadata for all files and folders whose filename contains the given search string as a substring.
+      Searches are limited to the folder path and its sub-folder hierarchy provided in the call.>>
+    queryParameters:
+      query:
+        required: true
+        type: string
+      file_limit:
+        required: false
+        type: string
+      include_deleted:
+        required: false
+        type: boolean
+      locale:
+        required: false
+        type: string
+      include_membership:
+        required: false
+        type: boolean
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                [
+                  {
+                      "size": "0 bytes",
+                      "rev": "35c1f029684fe",
+                      "thumb_exists": false,
+                      "bytes": 0,
+                      "modified": "Mon, 18 Jul 2011 20:13:43 +0000",
+                      "path": "/Public/latest.txt",
+                      "is_dir": false,
+                      "icon": "page_white_text",
+                      "root": "dropbox",
+                      "mime_type": "text/plain",
+                      "revision": 220191
+                  }
+                ]
+              }
+  post:
+    description: <<insert text or markdown here>>
+    queryParameters:
+      query:
+        required: true
+        type: string
+      file_limit:
+        required: false
+        type: string
+      include_deleted:
+        required: false
+        type: boolean
+      locale:
+        required: false
+        type: string
+      include_membership:
+        required: false
+        type: boolean
+    responses:
+      200:
+        body:
+          application/json:
+/shares/auto/{path}:
+  post:
+    description: <<Creates and returns a shared link to a file or folder.>>
+    queryParameters:
+      locale:
+        required: false
+        type: string
+      short_url:
+        required: false
+        type: boolean
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "url": "https://db.tt/c0mFuu1Y",
+                "expires": "Tue, 01 Jan 2030 00:00:00 +0000",
+                "visibility": "PUBLIC"
+              }
+/media/auto/{path}:
+  post:
+    description: <<Returns a link directly to a file.
+      Similar to /shares. The difference is that this bypasses the Dropbox webserver, used to provide a preview of the file, so that you can effectively stream the contents of your media. This URL should not be used to display content directly in the browser.>>
+    queryParameters:
+      locale:
+        required: false
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "url": "https://dl.dropboxusercontent.com/1/view/abcdefghijk/example",
+                "expires": "Fri, 16 Sep 2011 01:01:25 +0000"
+              }
+/copy_ref/auto/{path}:
+  get:
+    description: <<Creates and returns a copy_ref to a file. This reference string can be used to copy that file to another user's Dropbox by passing it in as the from_copy_ref parameter on /fileops/copy.>>
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "copy_ref": "z1X6ATl6aWtzOGq0c3g5Ng",
+                "expires": "Fri, 31 Jan 2042 21:01:05 +0000"
+              }
+/thumbnails/auto/{path}:
+  get:
+    description: <<insert text or markdown here>>
+    queryParameters:
+      format:
+        required: false
+        type: string
+      size:
+        required: false
+        type: string
+    responses:
+      200:
+        body:
+          application/json:
+/previews/auto/{path}:
+  get:
+    description: <<Gets a preview for a file. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com.>>
+    responses:
+      200:
+/shared_folders/{id}:
+  get:
+    description: <<Returns a list of all shared folders the authenticated user has access to or metadata about a specific shared folder.
+      This API call requires Full Dropbox or File type permissions.>>
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                [
+                  {
+                      "id": "...",
+                      "path": "...",
+                      "access_level": "...",
+                      "owner": { ... },
+                      "members": [
+                          {
+                              "user": {
+                                  "uid": 87654321,
+                                  "display_name": "Jane P. User",
+                                  "same_team": true,
+                                  "member_id": "dbmid:abcd1234"
+                              },
+                              "role": "owner",
+                              "active": true
+                          },
+                          ...
+                      ]
+                  },
+                  ...
+                ]
+              }
+/fileops:
+  /copy:
+    post:
+      description: <<Copies a file or folder to a new location.>>
+      queryParameters:
+        root:
+          required: true
+          type: string
+        from_path:
+          required: false
+          type: string
+        to_path:
+          required: true
+          type: string
+        locale:
+          required: false
+          type: string
+        from_copy_ref:
+          required: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "size": "15 bytes",
+                  "rev": "1f0a503351f",
+                  "thumb_exists": false,
+                  "bytes": 15,
+                  "modified": "Wed, 10 Aug 2011 18:21:29 +0000",
+                  "path": "/test1.txt",
+                  "is_dir": false,
+                  "icon": "page_white_text",
+                  "root": "dropbox",
+                  "mime_type": "text/plain",
+                  "revision": 496342
+                }
+  /create_folder:
+    post:
+      description: <<Creates a folder.>>
+      queryParameters:
+        root:
+          required: true
+          type: string
+        path:
+          required: true
+          type: string
+        locale:
+          required: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "size": "0 bytes",
+                  "rev": "1f477dd351f",
+                  "thumb_exists": false,
+                  "bytes": 0,
+                  "modified": "Wed, 10 Aug 2011 18:21:30 +0000",
+                  "path": "/new_folder",
+                  "is_dir": true,
+                  "icon": "folder",
+                  "root": "dropbox",
+                  "revision": 5023410
+                }
+  /delete:
+    post:
+      description: <<Deletes a file or folder.>>
+      queryParameters:
+        root:
+          required: true
+          type: string
+        path:
+          required: true
+          type: string
+        locale:
+          required: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "size": "0 bytes",
+                  "is_deleted": true,
+                  "bytes": 0,
+                  "thumb_exists": false,
+                  "rev": "1f33043551f",
+                  "modified": "Wed, 10 Aug 2011 18:21:30 +0000",
+                  "path": "/test .txt",
+                  "is_dir": false,
+                  "icon": "page_white_text",
+                  "root": "dropbox",
+                  "mime_type": "text/plain",
+                  "revision": 492341
+                }
+  /move:
+    post:
+      description: <<Moves a file or folder to a new location>>
+      queryParameters:
+        root:
+          required: true
+          type: string
+        from_path:
+          required: true
+          type: string
+        to_path:
+          required: true
+          type: string
+        locale:
+          required: false
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "size": "15 bytes",
+                  "rev": "1e0a503351f",
+                  "thumb_exists": false,
+                  "bytes": 15,
+                  "modified": "Wed, 10 Aug 2011 18:21:29 +0000",
+                  "path": "/test2.txt",
+                  "is_dir": false,
+                  "icon": "page_white_text",
+                  "root": "dropbox",
+                  "mime_type": "text/plain",
+                  "revision": 496342
+                }

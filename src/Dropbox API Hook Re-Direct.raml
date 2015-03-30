@@ -1,0 +1,15 @@
+#%RAML 0.8
+title: Dropbox API Hook Re-Direct
+version: 1.0
+baseUri: http://win7-64-vm:9905/dropbox_hook
+/auth_success:
+  displayName: Re-direct URL for dropbox Auth server
+  get:
+    description: <<send auth token and status>>
+    queryParameters:
+      code:
+        type: string
+        required: true
+      status:
+        type: string
+        required: true

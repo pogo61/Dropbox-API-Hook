@@ -1,0 +1,197 @@
+#%RAML 0.8
+title: Dropbox Content API
+version: 1.0
+baseUri: https://api-content.dropbox.com/1
+securedBy: [oauth_2_0]
+securitySchemes:
+- oauth_2_0:
+    description: |
+            Dropbox supports OAuth 2.0 for authenticating all API requests.
+    type: OAuth 2.0
+    describedBy:
+      headers:
+        Authorization:
+          description: |
+            Used to send a valid OAuth 2 access token. Do not use
+            with the "access_token" query string parameter.
+          type: string
+      queryParameters:
+        access_token:
+          description: |
+            Used to send a valid OAuth 2 access token. Do not use together with
+            the "Authorization" header
+          type: string
+      responses:
+        401:
+          description: |
+            Bad or expired token. This can happen if the user or Dropbox
+            revoked or expired an access token. To fix, you should re-
+            authenticate the user.
+        403:
+          description: |
+            Bad OAuth request (wrong consumer key, bad nonce, expired
+            imestamp...). Unfortunately, re-authenticating the user won't help here.
+    settings:
+      authorizationUri: https://www.dropbox.com/1/oauth2/authorize 
+      accessTokenUri: https://www.dropbox.com/developers/core/docs#oa2-token
+      authorizationGrants: [ authorization_code ]
+/files/auto/{path}:
+  get:
+    description: <<Downloads a file.>>
+    queryParameters:
+          fields:
+            type: string
+            required:  false
+    responses:
+          200:
+           body:
+             application/json:
+/files_put/auto/{path}:
+  put:
+    description: <<Uploads a file using PUT semantics. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com. The preferred HTTP method for this call is PUT.>>
+    queryParameters:
+      locale:
+        type: string
+        required:  false
+      overwrite:
+        type: boolean
+        required:  false
+      parent_rev:
+        type: string
+        required:  false
+      autorename:
+        type: boolean
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+                example: |
+                  {
+                    "size": "225.4KB",
+                    "rev": "35e97029684fe",
+                    "thumb_exists": false,
+                    "bytes": 230783,
+                    "modified": "Tue, 19 Jul 2011 21:55:38 +0000",
+                    "path": "/Getting_Started.pdf",
+                    "is_dir": false,
+                    "icon": "page_white_acrobat",
+                    "root": "dropbox",
+                    "mime_type": "application/pdf",
+                    "revision": 220823
+                  }
+  post:
+    description: <<For compatibility with browser environments, the POST HTTP method is also recognized>>
+    queryParameters:
+      locale:
+        type: string
+        required:  false
+      overwrite:
+        type: boolean
+        required:  false
+      parent_rev:
+        type: string
+        required:  false
+      autorename:
+        type: boolean
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+                example: |
+                  {
+                    "size": "225.4KB",
+                    "rev": "35e97029684fe",
+                    "thumb_exists": false,
+                    "bytes": 230783,
+                    "modified": "Tue, 19 Jul 2011 21:55:38 +0000",
+                    "path": "/Getting_Started.pdf",
+                    "is_dir": false,
+                    "icon": "page_white_acrobat",
+                    "root": "dropbox",
+                    "mime_type": "application/pdf",
+                    "revision": 220823
+                  }
+/thumbnails/auto/{path}:  
+  get:
+    description: <<Gets a thumbnail for an image. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com.>>
+    queryParameters:
+      format:
+        type: string
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+/previews/auto/{path}:  
+  get:
+    description: <<Gets a preview for a file>>
+    queryParameters:
+      rev:
+        type: string
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+/chunked_upload:
+  put:
+    description: <<Uploads large files to Dropbox in multiple chunks. Also has the ability to resume if the upload is interrupted. This allows for uploads larger than the /files_put maximum of 150 MB.>>
+    queryParameters:
+      upload_id:
+        type: string
+        required:  false
+      offset:
+        type: string
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+              example: |
+                {
+                  "upload_id": "v0k84B0AT9fYkfMUp0sBTA",
+                  "offset": 31337,
+                  "expires": "Tue, 19 Jul 2011 21:55:38 +0000"
+                }
+/commit_chunked_upload:
+  post:
+    description: <<Completes an upload initiated by the /chunked_upload method. Saves a file uploaded via /chunked_upload to a user's Dropbox. /commit_chunked_upload is similar to /files_put. The main difference is that while /files_put takes the file contents in the request body, /commit_chunked_upload takes a parameter upload_id, which is obtained when the file contents are uploaded via /chunked_upload.>>
+    queryParameters:
+      upload_id:
+        type: string
+        required:  false
+      offset:
+        type: string
+        required:  false
+      locale:
+        type: string
+        required:  false
+      overwrite:
+        type: boolean
+        required:  false
+      parent_rev:
+        type: string
+        required:  false
+      autorename:
+        type: boolean
+        required:  false
+    responses:
+          200:
+           body:
+             application/json:
+              example: |
+                {
+                  "size": "225.4KB",
+                  "rev": "35e97029684fe",
+                  "thumb_exists": false,
+                  "bytes": 230783,
+                  "modified": "Tue, 19 Jul 2011 21:55:38 +0000",
+                  "path": "/Getting_Started.pdf",
+                  "is_dir": false,
+                  "icon": "page_white_acrobat",
+                  "root": "dropbox",
+                  "mime_type": "application/pdf",
+                  "revision": 220823
+                }
