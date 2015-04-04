@@ -109,7 +109,7 @@ Then the /helloworld Operation in the VS was mapped to the GET /account/info ope
 
 Go to the Dropbox_API_Helloworld VS -> Operations Tab -> GET /hellowworld operation -> Process tab you'll see this image:
 ![Helloworld process] 
-(https://github.com/pogo61/Dropbox-API-Hook/blob/master/Screen%20Shot.png
+(https://github.com/pogo61/Dropbox-API-Hook/blob/master/Screen%20Shot.png)
 
 Double click on the invoke activity to see how these work to make the Hello World operation call successful.
 
