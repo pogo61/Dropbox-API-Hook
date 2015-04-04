@@ -6,7 +6,7 @@
 ## Dropbox API 
 ### About the API
 - CRUD files on Dropbox
-- Home Page: [Dropbox docs] (https://www.dropbox.com/)
+- Home Page: [Dropbox] (https://www.dropbox.com/)
 - API Documentation: [Dropbox API docs] (https://www.dropbox.com/developers)
 
 ### Pre-Reqs
