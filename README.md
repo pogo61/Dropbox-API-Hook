@@ -11,7 +11,7 @@
 
 ### Pre-Reqs
 - you must install the pso extensions custom polices:
-    + unzip the com.soa.pso.openapi.extensions_7.2.2.zip (available in this repository) into the <Policy Manager Home>/sm70 directory. This will result in files placed in the sm70/lib/pso.opeapi.extensions_7.2.2 subdirectory
+    + unzip the com.soa.pso.openapi.extensions_7.2.2.zip (available in this repository) into the "Policy Manager Home"/sm70 directory. This will result in files placed in the sm70/lib/pso.opeapi.extensions_7.2.2 subdirectory
     + restart both PM and ND(s)
     + Using the SOA Admin Console, install the following features in each PM container:
         * SOA Professional Services OpenAPI Extensions
@@ -20,7 +20,7 @@
         * SOA Professional Services OpenAPI Extensions
 - Register the application by defining an 'App' in the [Dropbox Developers App Console] (https://www.dropbox.com/developers/apps). Creating an account if you have not already registered. Ensuring that you select 'Dropbox API App' as the type.
 - once the App is defined, double click on it to be taken the the App details page. 
-- Define you re-direct URL "https://<ND HOST>:<HTTPS Port>/dropbox_hook/auth_success" in the OAuth 2 Redirect URIs field. 
+- Define you re-direct URL "https://'ND HOST':'HTTPS Port'/dropbox_hook/auth_success" in the OAuth 2 Redirect URIs field. 
 - *Note the https in the URL. Please ensure that you get the PM Admin to define a HTTPS listener for your ND. Also ensure that the HOST and Port are accessible from the internet.*
 - Copy the 'App Key' and 'App Secret' from this same page. 
 
