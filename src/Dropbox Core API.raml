@@ -153,7 +153,9 @@ schemas:
                     "normal": 680031877871
                 }
               }
-/metadata/auto/{path}:
+/metadata/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder. 
   get:
     description: <<Retrieves file and folder metadata.>>
     queryParameters:
@@ -200,7 +202,9 @@ schemas:
                 "mime_type": "application/pdf",
                 "revision": 220823
               }
-/delta/auto/{path}:
+/delta/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   post:
     description: <<A way of letting you keep up with changes to files and folders in a user's Dropbox. You can periodically call /delta to get a list of "delta entries", which are instructions on how to update your local state to match the server's state.>>
     queryParameters:
@@ -220,7 +224,9 @@ schemas:
       200:
         body:
           application/json:
-  /latest_cursor/auto/{path}:
+  /latest_cursor/{root}/{path}:
+    description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
     post:
       description: <<A way to quickly get a cursor for the server's state, for use with /delta. Unlike /delta, /delta/latest_cursor does not return any entries, so your app will not know about any existing files or folders in the Dropbox account. For example, if your app processes future delta entries and sees that a folder was deleted, your app won't know what files were in that folder. Use this endpoint if your app only needs to know about new files and modifications and doesn't need to know about files that already exist in Dropbox. If you need to build local state to match the server state in Dropbox, you should instead use /delta.>>
       queryParameters:
@@ -234,7 +240,9 @@ schemas:
         200:
           body:
             application/json:
-/revisions/auto/{path}:
+/revisions/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   get:
     description: <<Obtains metadata for the previous revisions of a file.
       Only revisions up to thirty days old are available (or more if the Dropbox user has Packrat). You can use the revision number in conjunction with the /restore call to revert the file to its previous state.>>
@@ -281,7 +289,9 @@ schemas:
                   }
                 ]
               }
-/restore/auto/{path}:
+/restore/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   post:
     description: <<Restores a file path to a previous revision.
 
@@ -312,7 +322,9 @@ schemas:
                 "mime_type": "application/octet-stream",
                 "size": "0 bytes"
                }
-/search/auto/{path}:
+/search/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   get:
     description: <<Returns metadata for all files and folders whose filename contains the given search string as a substring.
       Searches are limited to the folder path and its sub-folder hierarchy provided in the call.>>
@@ -376,7 +388,9 @@ schemas:
       200:
         body:
           application/json:
-/shares/auto/{path}:
+/shares/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   post:
     description: <<Creates and returns a shared link to a file or folder.>>
     queryParameters:
@@ -396,7 +410,9 @@ schemas:
                 "expires": "Tue, 01 Jan 2030 00:00:00 +0000",
                 "visibility": "PUBLIC"
               }
-/media/auto/{path}:
+/media/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   post:
     description: <<Returns a link directly to a file.
       Similar to /shares. The difference is that this bypasses the Dropbox webserver, used to provide a preview of the file, so that you can effectively stream the contents of your media. This URL should not be used to display content directly in the browser.>>
@@ -413,7 +429,9 @@ schemas:
                 "url": "https://dl.dropboxusercontent.com/1/view/abcdefghijk/example",
                 "expires": "Fri, 16 Sep 2011 01:01:25 +0000"
               }
-/copy_ref/auto/{path}:
+/copy_ref/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   get:
     description: <<Creates and returns a copy_ref to a file. This reference string can be used to copy that file to another user's Dropbox by passing it in as the from_copy_ref parameter on /fileops/copy.>>
     responses:
@@ -425,7 +443,9 @@ schemas:
                 "copy_ref": "z1X6ATl6aWtzOGq0c3g5Ng",
                 "expires": "Fri, 31 Jan 2042 21:01:05 +0000"
               }
-/thumbnails/auto/{path}:
+/thumbnails/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   get:
     description: <<insert text or markdown here>>
     queryParameters:
@@ -439,12 +459,15 @@ schemas:
       200:
         body:
           application/json:
-/previews/auto/{path}:
+/previews/{root}/{path}:
+  description: The value of "{root}" must be one of "auto", "dropbox", or "sanbox". 
+     the value of "{path}" can be null or the path (relative to the root folder) to the file or folder.
   get:
     description: <<Gets a preview for a file. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com.>>
     responses:
       200:
 /shared_folders/{id}:
+  description: The value of "{id}" is the dropbox generated identifier
   get:
     description: <<Returns a list of all shared folders the authenticated user has access to or metadata about a specific shared folder.
       This API call requires Full Dropbox or File type permissions.>>

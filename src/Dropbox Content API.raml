@@ -35,7 +35,7 @@ securitySchemes:
       authorizationUri: https://www.dropbox.com/1/oauth2/authorize 
       accessTokenUri: https://www.dropbox.com/developers/core/docs#oa2-token
       authorizationGrants: [ authorization_code ]
-/files/auto/{path}:
+/files/{root}/{path}:
   get:
     description: <<Downloads a file.>>
     queryParameters:
@@ -46,7 +46,7 @@ securitySchemes:
           200:
            body:
              application/json:
-/files_put/auto/{path}:
+/files_put/{root}/{path}:
   put:
     description: <<Uploads a file using PUT semantics. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com. The preferred HTTP method for this call is PUT.>>
     queryParameters:
@@ -113,7 +113,7 @@ securitySchemes:
                     "mime_type": "application/pdf",
                     "revision": 220823
                   }
-/thumbnails/auto/{path}:  
+/thumbnails/{root}/{path}:  
   get:
     description: <<Gets a thumbnail for an image. Note that this call goes to api-content.dropbox.com instead of api.dropbox.com.>>
     queryParameters:
@@ -124,7 +124,7 @@ securitySchemes:
           200:
            body:
              application/json:
-/previews/auto/{path}:  
+/previews/{root}/{path}:  
   get:
     description: <<Gets a preview for a file>>
     queryParameters:
