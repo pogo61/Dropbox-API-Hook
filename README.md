@@ -11,16 +11,19 @@
 
 ### Pre-Reqs
 - you must install the pso extensions custom polices:
-    + unzip the com.soa.pso.openapi.extensions_7.2.2.zip (available in this repository) into the "Policy Manager Home"/sm70 directory. This will result in files placed in the sm70/lib/pso.opeapi.extensions_7.2.2 subdirectory
-    + restart both PM and ND(s)
-    + Using the SOA Admin Console, install the following features in each PM container:
-        * SOA Professional Services OpenAPI Extensions
-        * SOA Professional Services OpenAPI Extensions UI
-    + Using the SOA Admin Console, install the following features in each ND container:
-        * SOA Professional Services OpenAPI Extensions
+    + unzip the com.akana.pso.apihooks.extensions_7.2.0.zip (available in this repository) into the <Policy Manager Home>/sm70 directory. 
+    + unzip the com.akana.pso.apihooks.technology.preview_7.2.90.zip (available in this repository) into the <Policy Manager Home>/sm70 directory
+    + unzip the com.akana.pso.persistence_7.2.0.zip (available in this repository) into the <Policy Manager Home>/sm70 directory.
+    + stop all PM and ND(s)
+    + run the configurator in update mode for all the PM and ND instances (see your PM administrator about the "Installing Policy Manager x.y" guide)
+    + Using the SOA Admin Console, install the following Plug-ins in each PM container:
+        * Akana PSO Persistence
+    + Using the SOA Admin Console, install the following Plug-ins in each ND container:
+        * Akana APIHooks Enhancements
+    + restart all PM and ND(s)
 - Register the application by defining an 'App' in the [Dropbox Developers App Console] (https://www.dropbox.com/developers/apps). Creating an account if you have not already registered. Ensuring that you select 'Dropbox API App' as the type.
 - once the App is defined, double click on it to be taken the the App details page. 
-- Define you re-direct URL "https://'ND HOST':'HTTPS Port'/dropbox_hook/auth_success" in the OAuth 2 Redirect URIs field. 
+- Define your re-direct URL "https://'ND HOST':'HTTPS Port'/dropbox_hook/auth_success" in the OAuth 2 Redirect URIs field. 
 - *Note the https in the URL. Please ensure that you get the PM Admin to define a HTTPS listener for your ND. Also ensure that the HOST and Port are accessible from the internet.*
 - Copy the 'App Key' and 'App Secret' from this same page. 
 
@@ -49,8 +52,6 @@
 #### Configure Security
 - Go to Google Sheets API Hook -> Policies -> Operational Policies ->    ProcessVariables policy
     - Click "modify" in the XML Policy Tab. An XML Policy Content editor dialog will be displayed.
-    - change the value of the 'appkey' element to be the 'App Key' value you saved from the Dropbox Developers App Console, above. 
-    - change the value of the 'appsecret' element to be the 'App Secret' value you saved from the Dropbox Developers App Console, above.
     - change the value of the 'redirectURI' element to be the 'Redirect URL' value you added in the the Dropbox Developers App Console, above.
     - save the changes
     - click on the "Activate Policy" workflow activity in the righ-hand Activities portlet
