@@ -56,69 +56,6 @@ schemas:
         }
       }
     }
-/oauth2:
-  /authorize:
-    get:
-      description: <<This starts the OAuth 2.0 authorization flow. This isn't an API call—it's the web page that lets the user sign in to Dropbox and authorize your app. After the user decides whether or not to authorize your app, they will be redirected to the URI specified by redirect_uri.>>
-      queryParameters:
-        response_type:
-          description: The grant type requested, either token or code.
-          required: true
-          type: string
-        client_id:
-          description: The app's key, found in the App Console.
-          required: true
-          type: string
-        redirect_uri:
-          description:  Where to redirect the user after authorization has completed. This must be the exact URI registered in the App Console; even 'localhost' must be listed if it is used for testing. A redirect URI is required for a token flow, but optional for code. If the redirect URI is omitted, the code will be presented directly to the user and they will be invited to enter the information in your app.
-          required: false
-          type: string
-        state:
-          description: Up to 500 bytes of arbitrary data that will be passed back to your redirect URI. This parameter should be used to protect against cross-site request forgery (CSRF). See Sections 4.4.1.8 and 4.4.2.5 of the OAuth 2.0 threat model spec.
-          required: false
-          type: string
-        force_reapprove:
-          description: Whether or not to force the user to approve the app again if they've already done so. If false (default), a user who has already approved the application may be automatically redirected to the URI specified by redirect_uri. If true, the user will not be automatically redirected and will have to approve the app again.
-          required: false
-          type: string
-        disable_signup:
-          description: When true (default is false) users will not be able to sign up for a Dropbox account via the authorization page. Instead, the authorization page will show a link to the Dropbox iOS app in the App Store. This is only intended for use when necessary for compliance with App Store policies.
-          required: false
-          type: string
-      responses:
-        302:
-  /token:
-    post:
-      description: <<This endpoint only applies to apps using the authorization code flow. An app calls this endpoint to acquire a bearer token once the user has authorized the app.
-       Calls to /oauth2/token need to be authenticated using the apps's key and secret. These can either be passed as POST parameters (see parameters below) or via HTTP basic authentication. If basic authentication is used, the app key should be provided as the username, and the app secret should be provided as the password.>>
-      queryParameters:
-        code:
-          description: The code acquired by directing users to /oauth2/authorize?response_type=code.
-          required: true
-          type: string
-        grant_type:
-          description:  The grant type, which must be authorization_code
-          required: true
-          type: string
-        client_id:
-          description: If credentials are passed in POST parameters, this parameter should be present and should be the app's key (found in the App Console).
-          required: false
-          type: string
-        client_secret:
-          description:  If credentials are passed in POST parameters, this parameter should be present and should be the app's secret.
-          required: false
-          type: string
-        redirect_uri:
-          description:  Only used to validate that it matches the original /oauth2/authorize, not used to redirect again.
-          required: false
-          type: string
-      responses:
-        200:
-          body:
-            application/json:
-              example: |
-                {"access_token": "ABCDEFG", "token_type": "bearer", "uid": "12345"}
-  
 /account/info:
   get:
     description: <<Retrieves information about the user's account.>>
