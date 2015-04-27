@@ -15,7 +15,19 @@
     + unzip the com.akana.pso.apihooks.technology.preview_7.2.90.zip (available in this repository) into the <Policy Manager Home>/sm70 directory
     + unzip the com.akana.pso.persistence_7.2.0.zip (available in this repository) into the <Policy Manager Home>/sm70 directory.
     + stop all PM and ND(s)
-    + run the configurator in update mode for all the PM and ND instances (see your PM administrator about the "Installing Policy Manager x.y" guide)
+    + run the configurator in update mode for all the PM and ND instances:
+        + run this command, depending on whether you are running on Windows or Linux:
+            Windows: 
+            [Gateway base dir]\sm70\bin>startup.bat configurator "-Dsilent=true" "-DdeploymentName=Standalone" "-Dproperties=C:/<property file directory location>/myprops.properties" 
+     
+            UNIX 
+            [Gateway base dir]/sm70/bin>startup.sh configurator "-Dsilent=true" "-DdeploymentName=Standalone" "-Dproperties=/export/home/username/<property file directory location>\myprops.properties"
+        + the myprops.properties path must be the fully qualified path, and the file contnents will look like:
+            container.instance.name=[intance name, e.g. PM]
+            credential.username = [administrator login] 
+            credential.password = [administrator password] 
+            default.host=[instance Host, e.g. localhost] 
+            default.port=[instance Port, e.g. 9905]
     + Using the SOA Admin Console, install the following Plug-ins in each PM container:
         * Akana PSO Persistence
     + Using the SOA Admin Console, install the following Plug-ins in each ND container:
